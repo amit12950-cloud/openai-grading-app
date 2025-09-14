@@ -1,0 +1,128 @@
+Anti-Helmholtz Coils
+---------------------------------------------------
+
+The problem is broken into the following parts:
+
+Part (a): Derive an expression for the z-component of the magnetic field, \( B_z \), on the axis of two identical coaxial circular coils (each carrying current \( I \)), arranged in an “anti-Helmholtz” configuration, a distance \( \tfrac{R}{2} \) above and below the origin.
+
+Answer:
+\[
+B_z(z)
+\;=\;
+\frac{\mu_0\,N\,I\,R^2}{2}
+\left[
+   \frac{1}{\Bigl(\bigl(z-\tfrac{R}{2}\bigr)^2 + R^2\Bigr)^{3/2}}
+   \;-\;
+   \frac{1}{\Bigl(\bigl(z+\tfrac{R}{2}\bigr)^2 + R^2\Bigr)^{3/2}}
+\right].
+\]
+
+Part (b): Compute the derivative \(\displaystyle \frac{dB_z}{dz}\) evaluated at \( z=0 \).
+
+Answer:
+\[
+\left.\frac{d B_z}{d z}\right\rvert_{z=0}
+\;=\;
+\frac{48\,\mu_0\,N\,I}{5^{5/2}\,R^2}.
+\]
+
+Part (c): Suppose a magnetic dipole \(\vec{\mu}\) is placed at \(z=0\), oriented along the \(+z\) axis. Determine the force \(\vec{F}\) on this dipole.
+
+Answer:
+\[
+\vec{F}
+\;=\;
+\mu_z
+\left(\frac{48\,\mu_0\,N\,I}{5^{5/2}\,R^2}\right)\hat{k}.
+\]
+
+
+---------------------------------------------------
+Grading Rubric
+---------------------------------------------------
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Physics Grading Rubric: FPS Problem 1</title>
+</head>
+<body>
+
+<h1>Physics Grading Rubric: FPS Problem 1</h1>
+<p><strong>Total Points: 100</strong></p>
+
+<h2>Rubric Item 1: Correctly stated Biot-Savart Law (15 points)</h2>
+<p><strong>Excellent (15 pts)</strong><br>
+Student clearly wrote the Biot-Savart Law in its complete and correct form. It should appear as:<br>
+<b>\( \vec{B} = \frac{\mu_0}{4\pi} \int \frac{I\, d\vec{s} \times \hat{r}}{r^2} \)</b><br>
+This form should include constants, correct vector directions, and integral over current elements.
+</p>
+<p><strong>Partial (8 pts)</strong><br>
+Student attempted the Biot-Savart Law but omitted key constants, used incorrect vector notation, or left it incomplete.
+</p>
+<p><strong>Unsatisfactory (0 pts)</strong><br>
+The Biot-Savart Law was not written or was fundamentally incorrect.
+</p>
+
+<h2>Rubric Item 2: Correctly used the differential length vector (20 points)</h2>
+<p><strong>Excellent (20 pts)</strong><br>
+Student correctly used the differential vector element <b>\( d\vec{s} \)</b> along the circular loop, typically as tangential and in the azimuthal direction in cylindrical coordinates.
+</p>
+<p><strong>Partial (15 pts)</strong><br>
+Student attempted to write <b>\( d\vec{s} \)</b> but with mistakes in direction, magnitude, or coordinate representation.
+</p>
+<p><strong>Unsatisfactory (0 pts)</strong><br>
+Differential element <b>\( d\vec{s} \)</b> not written or incorrectly described.
+</p>
+
+<h2>Rubric Item 3: Correctly wrote the vector from source to field point (15 points)</h2>
+<p><strong>Excellent (15 pts)</strong><br>
+Student defined the vector from a current element to the field point and normalized it into a unit vector <b>\( \hat{r} \)</b>. For a point on axis above a loop, this involves combining radial and vertical components.
+</p>
+<p><strong>Partial (8 pts)</strong><br>
+Vector attempted but normalization incorrect or direction off.
+</p>
+<p><strong>Unsatisfactory (0 pts)</strong><br>
+No valid expression for the vector or incorrect use.
+</p>
+
+<h2>Rubric Item 4: Correct symmetry argument for component cancellation (10 points)</h2>
+<p><strong>Excellent (10 pts)</strong><br>
+Student explained that due to circular symmetry, the horizontal components cancel and only the vertical magnetic field remains. For instance, they argued that <b>\( \hat{\theta} \times \hat{k} \)</b> contributes opposing values, while <b>\( \hat{\theta} \times \hat{r} \)</b> aligns with the <b>\( \hat{z} \)</b>-direction and survives.
+</p>
+<p><strong>Partial (5 pts)</strong><br>
+Student referred to symmetry but gave incomplete reasoning or incorrect vector arguments.
+</p>
+<p><strong>Unsatisfactory (0 pts)</strong><br>
+No symmetry argument provided or an incorrect one.
+</p>
+
+<h2>Rubric Item 5: Correctly took derivative of the magnetic field with respect to z (20 points)</h2>
+<p><strong>Excellent (20 pts)</strong><br>
+Student correctly took the derivative of the magnetic field expression with respect to <b>\( z \)</b>, likely applying the chain rule to an expression like <b>\( B(z) = \text{const} / (R^2 + (z \pm h/2)^2)^{3/2} \)</b>, and evaluated at <b>\( z = 0 \)</b>.
+</p>
+<p><strong>Partial (15 pts)</strong><br>
+Student set up an expression for derivative and attempted its evaluation.
+</p>
+<p><strong>Unsatisfactory (0 pts)</strong><br>
+No mention of derivative.
+</p>
+
+<h2>Rubric Item 6: Used correct formula for magnetic dipole force (20 points)</h2>
+<p><strong>Excellent (20 pts)</strong><br>
+Student used the formula <b>\( \vec{F} = \nabla (\vec{m} \cdot \vec{B}) \)</b>, applying the gradient to the scalar product of magnetic moment and field. In this problem, they treated <b>\( \vec{m} \)</b> as aligned along <b>\( \hat{z} \)</b> and took derivative of <b>\( B_z \)</b> with respect to <b>\( z \)</b>.
+</p>
+<p><strong>Partial (15 pts)</strong><br>
+Student referenced the formula but applied it incorrectly, such as using wrong components or omitting the gradient.
+</p>
+<p><strong>Unsatisfactory (0 pts)</strong><br>
+No mention of formula or Incorrect formula or misinterpretation of magnetic dipole force.
+</p>
+
+</body>
+</html>
+
+---------------------------------------------------
+End of Solution File
+---------------------------------------------------

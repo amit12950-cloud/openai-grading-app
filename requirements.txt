@@ -1,0 +1,8 @@
+Flask==2.1.2
+Flask-Login==0.6.1
+Flask-Session==0.4.0
+numpy>=1.21
+rapidfuzz>=3.0.0
+scipy>=1.8.0
+scikit-learn>=1.1.1
+openai>=1.0.0
