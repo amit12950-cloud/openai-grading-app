@@ -73,7 +73,5 @@ This repository contains a Flask‑based web application that grades student han
 
 ## Notes
 
-- **Image to LaTeX conversion** is not implemented.  You must integrate a separate OCR/LaTeX service (e.g., GPT‑4 Vision API) to convert images of handwritten solutions into text before grading.
-- This repository has been sanitised to remove hard‑coded API keys and secrets.  Always keep your API keys secure and do not commit them to version control.
 - For a production deployment, configure HTTPS and set a strong `APP_SECRET_KEY`.  Consider running the app behind a WSGI server such as Gunicorn.
 
