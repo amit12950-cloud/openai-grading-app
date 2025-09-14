@@ -1,41 +1,57 @@
 # OpenAI Grading App
 
-This repository contains a Flask‑based web application that grades student handwritten solutions to math problems using OpenAI embeddings.  The app authenticates users via MIT email and unique access codes, converts uploaded images to text, compares the student’s solution against an official rubric using vector embeddings, calculates scores, and stores results.
+This repository contains a Flask‑based web application that grades student handwritten solutions to math problems using OpenAI’s generative models and vector embeddings.  Students sign in with their MIT email address and a unique access code, upload pictures of their work, and the application automatically evaluates the submission against a rubric, calculates scores and provides detailed feedback.
 
-## Features
+## How it works
 
-* **User authentication** – students sign in with their MIT email and a unique access code stored in `userdatabase.csv`.
-* **Handwritten solution upload** – users can upload one or more images of their handwritten solution for each problem.
-* **Image to LaTeX conversion** – the uploaded images are sent to a conversion prompt that extracts text and equations; this part requires an external model or API capable of OCR and LaTeX generation (not included in this repo).
-* **Embedding‑based grading** – the student’s solution is compared against the official rubric using OpenAI `text‑embedding‑ada‑002` embeddings.  Cosine similarity and heuristics are used to compute scores and override low‑confidence answers.
-* **Result reporting** – the app displays detailed scoring feedback and stores grades in `grades.csv` for record keeping.
+### User authentication and uploading solutions
+* **Access codes and MIT email** – Students must log in with an `@mit.edu` address and a matching access code stored in `userdatabase.csv`.  Flask‑Login manages the session, and the app protects grading routes so unauthenticated users cannot upload or view results.
+* **Upload multiple images** – A student may upload one or more images of their handwritten solution.  The server temporarily stores these images and sends them to an external conversion model to extract the raw mathematical text and LaTeX.  The conversion step is invoked via a *conversion prompt* (see the `conversion_prompt` in `flask_app.py`【190676421023050†L490-L508】).  An external OCR/LaTeX service (such as GPT‑4 with vision or other OCR tools) must be supplied separately; the repository does not include image‑to‑LaTeX conversion.
+
+### Evaluating against a rubric
+* **Generative evaluation** – For each problem there is an official rubric stored in `solution_with_rubric_1.txt`.  The application constructs prompts to instruct GPT‑4 to grade the student’s solution: one prompt summarises the student’s answer and another rates each rubric item as *Excellent*, *Partial* or *Unsatisfactory*【190676421023050†L490-L508】.  To improve reliability, the model is run several times (`EVALUATION_RUNS`) and results are averaged using a thread pool【190676421023050†L538-L544】.
+* **Caching and fuzzy matching** – Before calling the model, the app checks a cache of previous evaluations.  Responses are normalised and compared using RapidFuzz to find similar answers; if a close match is found the cached grade is reused【190676421023050†L228-L241】.  This reduces cost and ensures consistent grading for similar answers.
+* **Embedding‑based override** – After grading, the code computes embeddings using OpenAI’s `text‑embedding‑ada‑002` model to measure cosine similarity between the student’s solution and the official solution.  Low‑confidence AI scores are overridden by similarity‑based heuristics【190676421023050†L132-L145】.
+* **Equation skeleton scoring** – To discourage superficial copying, the code extracts LaTeX equations and compares their “skeletons” using the Hungarian algorithm.  A skeleton similarity score is computed【190676421023050†L198-L218】.  When the generative model fails, a fallback TF‑IDF cosine similarity of the full texts is used【190676421023050†L555-L563】.  The final grade combines AI evaluation, skeleton similarity and embedding‑based overrides【190676421023050†L569-L569】.
+
+### Results and feedback
+* **Detailed result page** – After grading, the application displays a result page with the combined score, per‑rubric ratings and a performance message.  Students can also download a detailed evaluation report as a text file【190676421023050†L727-L764】.
+* **Comments and admin controls** – Students may leave anonymous comments after receiving their grade.  Administrators (identified by a password in the `ADMIN_PASSWORD` environment variable) can view grade summaries, reset attempts and upload new rubrics via dedicated routes【190676421023050†L625-L651】.  All grades are saved to `grades.csv` for future reference.
 
 ## Installation
 
-1. **Clone the repository** (or download the source code) and navigate into it:
+1. **Clone this repository** and navigate into it:
 
    ```bash
    git clone https://github.com/amit12950-cloud/openai-grading-app.git
    cd openai-grading-app
    ```
 
-2. **Create and activate a Python virtual environment** (recommended):
+2. **Create a virtual environment** (recommended) and activate it:
 
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
-3. **Install the dependencies** using the provided requirements file:
+3. **Install dependencies** from the provided requirements file:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Set your OpenAI API key**.  The application reads the OpenAI API key from the `OPENAI_API_KEY` environment variable.  Export your key before running the app:
+4. **Set environment variables**.  The app relies on several environment variables:
+
+   * `OPENAI_API_KEY` – your OpenAI API key.  Required to call GPT‑4 and the embedding model.
+   * `APP_SECRET_KEY` – secret key for Flask sessions.  Generate a random string for production.
+   * `ADMIN_PASSWORD` – password used for admin routes to reset attempts or upload new rubrics (optional).
+
+   Export these in your shell before running the app.  For example:
 
    ```bash
-   export OPENAI_API_KEY=<your-openai-api-key>
+   export OPENAI_API_KEY=<your-openai-key>
+   export APP_SECRET_KEY="<generate-a-random-secret>"
+   export ADMIN_PASSWORD="<admin-password>"
    ```
 
 5. **Run the application**:
@@ -44,17 +60,20 @@ This repository contains a Flask‑based web application that grades student han
    python flask_app.py
    ```
 
-   By default the Flask development server will run on port 5000.  Open `http://localhost:5000` in your web browser and log in with one of the email/code pairs from `userdatabase.csv`.
+   The Flask development server listens on port 5000.  Open `http://localhost:5000` in your browser.  Log in with one of the email/code pairs from `userdatabase.csv`.
 
 ## Repository structure
 
-* `flask_app.py` – main Flask server for the grading app.  This version has been sanitised to remove hard‑coded secrets and reads the OpenAI API key from `OPENAI_API_KEY`.
-* `requirements.txt` – lists the Python dependencies required to run the project.
-* `grades.csv` – CSV file used to store grading records; initially empty.
-* `solution_with_rubric_1.txt` – official rubric used to evaluate the first problem.
-* `userdatabase.csv` – contains user email addresses and corresponding access codes.
-* `templates/` – HTML templates for the user interface (added in a separate commit).
+- `flask_app.py` – main Flask server for the grading app.  Handles authentication, file uploads, conversion prompt, AI evaluation, caching, similarity scoring and result rendering.
+- `requirements.txt` – lists Python dependencies needed to run the application.
+- `grades.csv` – CSV file used to store grading records; initially empty.
+- `solution_with_rubric_1.txt` – official rubric used to evaluate the first problem (you can add more rubric files following the same naming convention).
+- `userdatabase.csv` – contains user email addresses and corresponding access codes.
+- `templates/` – HTML templates for the user interface (login page, upload form, result view, admin panels, etc.).
 
 ## Notes
 
-* For production deployment, ensure you set a secure `app.secret_key` in `flask_app.py` and configure HTTPS.  This project is provided for educational purposes.
+- **Image to LaTeX conversion** is not implemented.  You must integrate a separate OCR/LaTeX service (e.g., GPT‑4 Vision API) to convert images of handwritten solutions into text before grading.
+- This repository has been sanitised to remove hard‑coded API keys and secrets.  Always keep your API keys secure and do not commit them to version control.
+- For a production deployment, configure HTTPS and set a strong `APP_SECRET_KEY`.  Consider running the app behind a WSGI server such as Gunicorn.
+
